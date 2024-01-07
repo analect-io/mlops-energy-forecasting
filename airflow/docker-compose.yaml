@@ -120,7 +120,7 @@ services:
     <<: *airflow-common
     command: webserver
     ports:
-      - "8080:8080"
+      - "8081:8080"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
@@ -303,7 +303,7 @@ services:
     image: pypiserver/pypiserver:v1.5.2
     restart: always
     ports:
-      - "80:8080"
+      - "8090:8080"
     volumes:
       - ~/.htpasswd:/data/.htpasswd
     command:
@@ -314,3 +314,4 @@ services:
 
 volumes:
   postgres-db-volume:
+    
