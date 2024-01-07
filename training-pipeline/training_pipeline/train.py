@@ -128,7 +128,7 @@ def from_best_config(
         X_forecast = compute_forecast_exogenous_variables(X_test, fh)
         y_forecast = forecast(best_forecaster, X_forecast)
         logger.info(
-            f"Forecasted future values for renderin between {y_test.index.get_level_values('datetime_utc').min()} and {y_test.index.get_level_values('datetime_utc').max()}."
+            f"Forecasted future values for rendering between {y_test.index.get_level_values('datetime_utc').min()} and {y_test.index.get_level_values('datetime_utc').max()}."
         )
         results = OrderedDict(
             {
