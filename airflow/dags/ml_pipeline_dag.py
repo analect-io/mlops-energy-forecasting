@@ -19,11 +19,11 @@ def ml_pipeline():
     @task.virtualenv(
         task_id="run_feature_pipeline",
         requirements=[
-            "--trusted-host 172.17.0.1",
-            "--extra-index-url http://172.17.0.1",
+            "--trusted-host 192.168.192.27:8090",
+            "--extra-index-url http://192.168.192.27:8090",
             "feature_pipeline",
         ],
-        python_version="3.9",
+        python_version="3.11",
         multiple_outputs=True,
         system_site_packages=True,
     )
@@ -93,11 +93,11 @@ def ml_pipeline():
     @task.virtualenv(
         task_id="create_feature_view",
         requirements=[
-            "--trusted-host 172.17.0.1",
-            "--extra-index-url http://172.17.0.1",
+            "--trusted-host 192.168.192.27:8090",
+            "--extra-index-url http://192.168.192.27:8090",
             "feature_pipeline",
         ],
-        python_version="3.9",
+        python_version="3.11",
         multiple_outputs=True,
         system_site_packages=False,
     )
@@ -116,11 +116,11 @@ def ml_pipeline():
     @task.virtualenv(
         task_id="run_hyperparameter_tuning",
         requirements=[
-            "--trusted-host 172.17.0.1",
-            "--extra-index-url http://172.17.0.1",
+            "--trusted-host 192.168.192.27:8090",
+            "--extra-index-url http://192.168.192.27:8090",
             "training_pipeline",
         ],
-        python_version="3.9",
+        python_version="3.11",
         multiple_outputs=True,
         system_site_packages=False,
     )
@@ -141,11 +141,11 @@ def ml_pipeline():
     @task.virtualenv(
         task_id="upload_best_config",
         requirements=[
-            "--trusted-host 172.17.0.1",
-            "--extra-index-url http://172.17.0.1",
+            "--trusted-host 192.168.192.27:8090",
+            "--extra-index-url http://192.168.192.27:8090",
             "training_pipeline",
         ],
-        python_version="3.9",
+        python_version="3.11",
         multiple_outputs=False,
         system_site_packages=False,
     )
@@ -162,11 +162,11 @@ def ml_pipeline():
     @task.virtualenv(
         task_id="train_from_best_config",
         requirements=[
-            "--trusted-host 172.17.0.1",
-            "--extra-index-url http://172.17.0.1",
+            "--trusted-host 192.168.192.27:8090",
+            "--extra-index-url http://192.168.192.27:8090",
             "training_pipeline",
         ],
-        python_version="3.9",
+        python_version="3.11",
         multiple_outputs=True,
         system_site_packages=False,
         trigger_rule=TriggerRule.ALL_DONE,
@@ -197,11 +197,11 @@ def ml_pipeline():
     @task.virtualenv(
         task_id="compute_monitoring",
         requirements=[
-            "--trusted-host 172.17.0.1",
-            "--extra-index-url http://172.17.0.1",
+            "--trusted-host 192.168.192.27:8090",
+            "--extra-index-url http://192.168.192.27:8090",
             "batch_prediction_pipeline",
         ],
-        python_version="3.9",
+        python_version="3.11",
         system_site_packages=False,
     )
     def compute_monitoring(feature_view_metadata: dict):
@@ -220,11 +220,11 @@ def ml_pipeline():
     @task.virtualenv(
         task_id="batch_predict",
         requirements=[
-            "--trusted-host 172.17.0.1",
-            "--extra-index-url http://172.17.0.1",
+            "--trusted-host 192.168.192.27:8090",
+            "--extra-index-url http://192.168.192.27:8090",
             "batch_prediction_pipeline",
         ],
-        python_version="3.9",
+        python_version="3.11",
         system_site_packages=False,
     )
     def batch_predict(
