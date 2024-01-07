@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "batch_prediction_pipeline"}]
 
 [tool.poetry.dependencies]
-python = "~3.9"
+python = "~3.11"
 category-encoders = "^2.6.0"
 hopsworks = "3.4.3"
 python-dotenv = "^1.0.0"
@@ -15,16 +15,27 @@ lightgbm = "^3.3.5"
 sktime = "^0.16.1"
 google-cloud-storage = "^2.7.0"
 fire = "^0.5.0"
+s3fs = {extras = ["boto3"], version = ">=2023.12.0"}
+boto3 = "*"
+botocore = "*"
 training-pipeline = "^0.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
+ipykernel = "^6.20.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [[tool.poetry.source]]
-name = "test"  # This name will be used in the configuration to retreive the proper credentials
-url = "http://localhost"  # URL used to download your packages from
+name = "my-pypi"
+url = "http://192.168.192.27:8090"
+priority = "primary"
+
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+

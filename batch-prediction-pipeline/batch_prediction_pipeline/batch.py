@@ -8,6 +8,7 @@ import pandas as pd
 from batch_prediction_pipeline import data
 from batch_prediction_pipeline import settings
 from batch_prediction_pipeline import utils
+from batch_prediction_pipeline import utils_aws
 
 
 logger = utils.get_logger(__name__)
@@ -146,30 +147,31 @@ def forecast(model, X: pd.DataFrame, fh: int = 24):
 
 
 def save(X: pd.DataFrame, y: pd.DataFrame, predictions: pd.DataFrame):
-    """Save the input data, target data, and predictions to GCS."""
+    """Save the input data, target data, and predictions to S3."""
 
     # Get the bucket object from the GCS client.
-    bucket = utils.get_bucket()
+    #bucket = utils.get_bucket()
+    bucket = settings.SETTINGS["AWS_BUCKET_NAME"]
 
     # Save the input data and target data to the bucket.
-    for df, blob_name in zip(
+    for df, file_name in zip(
         [X, y, predictions], ["X.parquet", "y.parquet", "predictions.parquet"]
     ):
-        logger.info(f"Saving {blob_name} to bucket...")
-        utils.write_blob_to(
-            bucket=bucket,
-            blob_name=blob_name,
-            data=df,
+        logger.info(f"Saving {file_name} to bucket...")
+        utils_aws.write_df_to_s3(
+            bucket_name=bucket,
+            file_name=file_name,
+            df=df,
         )
-        logger.info(f"Successfully saved {blob_name} to bucket.")
+        logger.info(f"Successfully saved {file_name} to {bucket}.")
 
 
 def save_for_monitoring(predictions: pd.DataFrame, start_datetime: datetime):
-    """Save predictions to GCS for monitoring.
+    """Save predictions to S3 for monitoring.
 
-    The predictions are saved as a parquet file in GCS.
+    The predictions are saved as a parquet file in S3.
     The predictions are saved in a bucket with the following structure:
-    gs://<BUCKET_NAME>/predictions_monitoring.parquet
+    s3://<BUCKET_NAME>/predictions_monitoring.parquet
 
     The predictions are stored in a multiindex dataframe with the following indexes:
     - area: The area of the predictions, e.g. "DK1".
@@ -177,10 +179,11 @@ def save_for_monitoring(predictions: pd.DataFrame, start_datetime: datetime):
     - datetime_utc: The timestamp of the predictions, e.g. "2020-01-01 00:00:00" with a frequency of 1 hour.
     """
 
-    bucket = utils.get_bucket()
+    #bucket = utils.get_bucket()
+    bucket = settings.SETTINGS["AWS_BUCKET_NAME"]
 
-    cached_predictions = utils.read_blob_from(
-        bucket=bucket, blob_name=f"predictions_monitoring.parquet"
+    cached_predictions = utils_aws.read_parquet_from_s3(
+        bucket_name=bucket, file_name=f"predictions_monitoring.parquet"
     )
     has_cached_predictions = cached_predictions is not None
     if has_cached_predictions is True:
@@ -214,10 +217,10 @@ def save_for_monitoring(predictions: pd.DataFrame, start_datetime: datetime):
     ]
     predictions = predictions.dropna(subset=["energy_consumption"])
 
-    utils.write_blob_to(
-        bucket=bucket,
-        blob_name=f"predictions_monitoring.parquet",
-        data=predictions,
+    utils_aws.write_df_to_s3(
+        bucket_name=bucket,
+        file_name=f"predictions_monitoring.parquet",
+        df=predictions,
     )
     logger.info(f"Successfully cached predictions forecasted before {start_datetime}.")
 

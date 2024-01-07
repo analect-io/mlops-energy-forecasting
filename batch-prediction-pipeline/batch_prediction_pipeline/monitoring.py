@@ -9,6 +9,7 @@ from sktime.performance_metrics.forecasting import mean_absolute_percentage_erro
 from batch_prediction_pipeline import data
 from batch_prediction_pipeline import settings
 from batch_prediction_pipeline import utils
+from batch_prediction_pipeline import utils_aws
 
 
 logger = utils.get_logger(__name__)
@@ -26,9 +27,10 @@ def compute(feature_view_version: Optional[int] = None) -> None:
         feature_view_version = feature_view_metadata["feature_view_version"]
 
     logger.info("Loading old predictions...")
-    bucket = utils.get_bucket()
-    predictions = utils.read_blob_from(
-        bucket=bucket, blob_name=f"predictions_monitoring.parquet"
+    #bucket = utils.get_bucket()
+    bucket = settings.SETTINGS["AWS_BUCKET_NAME"]
+    predictions = utils_aws.read_parquet_from_s3(
+        bucket_name=bucket, file_name=f"predictions_monitoring.parquet"
     )
     if predictions is None or len(predictions) == 0:
         logger.info(
@@ -106,18 +108,18 @@ def compute(feature_view_version: Optional[int] = None) -> None:
     logger.info("Successfully computed metrics...")
 
     logger.info("Saving new metrics...")
-    utils.write_blob_to(
-        bucket=bucket,
-        blob_name=f"metrics_monitoring.parquet",
-        data=metrics,
+    utils_aws.write_df_to_s3(
+        bucket_name=bucket,
+        file_name=f"metrics_monitoring.parquet",
+        df=metrics,
     )
     latest_observations = latest_observations.rename(
         columns={"energy_consumption_observations": "energy_consumption"}
     )
-    utils.write_blob_to(
-        bucket=bucket,
-        blob_name=f"y_monitoring.parquet",
-        data=latest_observations[["energy_consumption"]],
+    utils_aws.write_df_to_s3(
+        bucket_name=bucket,
+        file_name=f"y_monitoring.parquet",
+        df=latest_observations[["energy_consumption"]],
     )
     logger.info("Successfully saved new metrics.")
 
